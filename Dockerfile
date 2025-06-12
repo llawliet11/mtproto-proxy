@@ -11,13 +11,19 @@ RUN apk add --no-cache \
     && update-ca-certificates
 
 # Download pre-built mtg binary from GitHub releases
-ARG MTG_VERSION=v2.1.7
-RUN wget -O mtg.tar.gz "https://github.com/9seconds/mtg/releases/download/${MTG_VERSION}/mtg-${MTG_VERSION}-linux-amd64.tar.gz" \
+ARG MTG_VERSION=2.1.7
+RUN echo "Downloading mtg v${MTG_VERSION}..." \
+    && wget --timeout=30 --tries=3 -O mtg.tar.gz \
+       "https://github.com/9seconds/mtg/releases/download/v${MTG_VERSION}/mtg-${MTG_VERSION}-linux-amd64.tar.gz" \
+    && echo "Download completed, extracting..." \
     && tar -xzf mtg.tar.gz \
+    && ls -la \
     && mv mtg /usr/local/bin/mtg \
     && chmod +x /usr/local/bin/mtg \
     && rm mtg.tar.gz \
-    && mtg --version
+    && echo "Testing mtg binary..." \
+    && mtg --version \
+    && echo "mtg installation completed successfully"
 
 # Create non-root user for security
 RUN addgroup -g 1000 mtg && \

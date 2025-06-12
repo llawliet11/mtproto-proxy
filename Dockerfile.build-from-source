@@ -17,7 +17,7 @@ ENV GOOS=linux
 ENV GOARCH=amd64
 
 # Clone the mtg repository with specific version
-RUN git clone --depth 1 --branch v2.1.6 https://github.com/9seconds/mtg.git . || \
+RUN git clone --depth 1 --branch v2.1.7 https://github.com/9seconds/mtg.git . || \
     git clone --depth 1 https://github.com/9seconds/mtg.git .
 
 # Verify we have the source code

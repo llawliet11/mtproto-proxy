@@ -1,0 +1,114 @@
+# Robust Dockerfile with multiple fallback strategies
+FROM alpine:latest
+
+# Install runtime dependencies and download tools
+RUN apk add --no-cache \
+    ca-certificates \
+    curl \
+    wget \
+    tzdata \
+    tar \
+    && update-ca-certificates
+
+# Download pre-built mtg binary with multiple fallback strategies
+ARG MTG_VERSION=2.1.7
+
+# Strategy 1: Try direct download with wget
+RUN echo "=== Attempting Strategy 1: Direct wget download ===" \
+    && (wget --timeout=30 --tries=3 -O mtg.tar.gz \
+        "https://github.com/9seconds/mtg/releases/download/v${MTG_VERSION}/mtg-${MTG_VERSION}-linux-amd64.tar.gz" \
+        && echo "Strategy 1: wget download successful" \
+        && tar -xzf mtg.tar.gz \
+        && mv mtg /usr/local/bin/mtg \
+        && chmod +x /usr/local/bin/mtg \
+        && rm mtg.tar.gz \
+        && echo "Strategy 1: Installation completed") \
+    || echo "Strategy 1: wget failed, trying Strategy 2..."
+
+# Strategy 2: Try with curl if wget failed
+RUN if [ ! -f /usr/local/bin/mtg ]; then \
+        echo "=== Attempting Strategy 2: curl download ===" \
+        && curl -L --max-time 30 --retry 3 -o mtg.tar.gz \
+           "https://github.com/9seconds/mtg/releases/download/v${MTG_VERSION}/mtg-${MTG_VERSION}-linux-amd64.tar.gz" \
+        && echo "Strategy 2: curl download successful" \
+        && tar -xzf mtg.tar.gz \
+        && mv mtg /usr/local/bin/mtg \
+        && chmod +x /usr/local/bin/mtg \
+        && rm mtg.tar.gz \
+        && echo "Strategy 2: Installation completed"; \
+    else \
+        echo "Strategy 1 succeeded, skipping Strategy 2"; \
+    fi
+
+# Strategy 3: Try previous version if current version fails
+RUN if [ ! -f /usr/local/bin/mtg ]; then \
+        echo "=== Attempting Strategy 3: Previous version (v2.1.6) ===" \
+        && wget --timeout=30 --tries=3 -O mtg.tar.gz \
+           "https://github.com/9seconds/mtg/releases/download/v2.1.6/mtg-2.1.6-linux-amd64.tar.gz" \
+        && echo "Strategy 3: Previous version download successful" \
+        && tar -xzf mtg.tar.gz \
+        && mv mtg /usr/local/bin/mtg \
+        && chmod +x /usr/local/bin/mtg \
+        && rm mtg.tar.gz \
+        && echo "Strategy 3: Installation completed with v2.1.6"; \
+    else \
+        echo "Previous strategy succeeded, skipping Strategy 3"; \
+    fi
+
+# Strategy 4: Build from source as last resort
+RUN if [ ! -f /usr/local/bin/mtg ]; then \
+        echo "=== Attempting Strategy 4: Build from source ===" \
+        && apk add --no-cache git go build-base \
+        && git clone --depth 1 --branch v${MTG_VERSION} https://github.com/9seconds/mtg.git /tmp/mtg \
+        && cd /tmp/mtg \
+        && go mod download \
+        && CGO_ENABLED=0 GOOS=linux go build -a -ldflags '-w -s -extldflags "-static"' -o mtg ./cmd/mtg \
+        && mv mtg /usr/local/bin/mtg \
+        && chmod +x /usr/local/bin/mtg \
+        && cd / \
+        && rm -rf /tmp/mtg \
+        && apk del git go build-base \
+        && echo "Strategy 4: Build from source completed"; \
+    else \
+        echo "Previous strategy succeeded, skipping Strategy 4"; \
+    fi
+
+# Verify installation
+RUN echo "=== Verifying mtg installation ===" \
+    && ls -la /usr/local/bin/mtg \
+    && /usr/local/bin/mtg --version \
+    && echo "=== mtg installation verification completed ==="
+
+# Create non-root user for security
+RUN addgroup -g 1000 mtg && \
+    adduser -D -s /bin/sh -u 1000 -G mtg mtg
+
+# Set working directory
+WORKDIR /app
+
+# Create necessary directories
+RUN mkdir -p /app/logs /app/config && \
+    chown -R mtg:mtg /app
+
+# Copy configuration files
+COPY scripts/entrypoint.sh /app/entrypoint.sh
+COPY scripts/healthcheck.sh /app/healthcheck.sh
+
+# Make scripts executable
+RUN chmod +x /app/entrypoint.sh /app/healthcheck.sh
+
+# Switch to non-root user
+USER mtg
+
+# Expose ports
+EXPOSE 8443 3001
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD /app/healthcheck.sh
+
+# Set entrypoint
+ENTRYPOINT ["/app/entrypoint.sh"]
+
+# Default command
+CMD ["mtg"]
