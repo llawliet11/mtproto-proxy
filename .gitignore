@@ -1,12 +1,18 @@
-# Environment files
+# Environment files (SENSITIVE - Contains secrets and production config)
 .env
+.env.*
 .env.local
-.env.*.local
 .env.production
+.env.development
+.env.staging
+.env.test
 
-# Logs
+# Logs (May contain sensitive information)
 logs/
 *.log
+log/
+test-report-*.txt
+*.report
 
 # Runtime files
 *.pid
@@ -47,11 +53,18 @@ data/
 # Configuration backups
 config/*.bak
 
-# SSL certificates (if any)
+# SSL certificates and secrets (SENSITIVE)
 *.pem
 *.key
 *.crt
 *.cert
+*.p12
+*.pfx
+*secret*
+*password*
+*token*
+auth.json
+credentials.json
 
 # Local development
 local/
@@ -101,3 +114,33 @@ jspm_packages/
 
 # Yarn Integrity file
 .yarn-integrity
+
+# =============================================================================
+# MTPROTO PROXY SPECIFIC SENSITIVE FILES
+# =============================================================================
+
+# Proxy configuration backups
+*.env.backup
+config.backup
+proxy.config
+
+# Statistics and monitoring data
+stats.json
+metrics.json
+monitoring.log
+
+# User data and connection logs
+connections.log
+users.log
+access.log
+
+# Database files (if any)
+*.db
+*.sqlite
+*.sqlite3
+
+# Process and runtime files
+*.pid
+*.sock
+mtg.pid
+proxy.pid
