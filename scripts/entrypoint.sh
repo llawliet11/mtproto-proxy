@@ -43,12 +43,26 @@ validate_env() {
         log_error "MTG_SECRET environment variable is required"
         exit 1
     fi
-    
-    if [ ${#MTG_SECRET} -ne 32 ]; then
-        log_error "MTG_SECRET must be exactly 32 characters (16 bytes in hex)"
+
+    # MTG v2 secrets can be either:
+    # - 32 chars (16 bytes hex) for simple mode
+    # - Longer for domain fronting (ee + 32 chars + domain hex)
+    if [ ${#MTG_SECRET} -lt 32 ]; then
+        log_error "MTG_SECRET must be at least 32 characters"
         exit 1
     fi
-    
+
+    # Check if it's a domain fronting secret (starts with 'ee')
+    if [ "${MTG_SECRET#ee}" != "$MTG_SECRET" ]; then
+        log_info "Using domain fronting secret (${#MTG_SECRET} characters)"
+    else
+        log_info "Using simple secret (${#MTG_SECRET} characters)"
+        if [ ${#MTG_SECRET} -ne 32 ]; then
+            log_error "Simple secrets must be exactly 32 characters (16 bytes in hex)"
+            exit 1
+        fi
+    fi
+
     log_success "Environment validation passed"
 }
 

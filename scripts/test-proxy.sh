@@ -40,9 +40,20 @@ test_config() {
         log_error "MTG_SECRET is not set"
         return 1
     fi
-    
-    if [[ ${#MTG_SECRET} -ne 32 ]]; then
-        log_error "MTG_SECRET must be 32 characters"
+
+    # MTG v2 secrets can be either simple (32 chars) or domain fronting (longer)
+    if [[ ${#MTG_SECRET} -lt 32 ]]; then
+        log_error "MTG_SECRET must be at least 32 characters"
+        return 1
+    fi
+
+    # Validate secret format
+    if [[ $MTG_SECRET == ee* ]]; then
+        log_success "Domain fronting secret detected (${#MTG_SECRET} characters)"
+    elif [[ ${#MTG_SECRET} -eq 32 ]]; then
+        log_success "Simple secret detected (32 characters)"
+    else
+        log_error "Invalid secret format: must be 32 chars or start with 'ee'"
         return 1
     fi
     
