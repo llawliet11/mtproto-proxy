@@ -227,6 +227,21 @@ The proxy was failing to start because mtg v2.1.7 uses a different command forma
 ✅ Correct: mtg simple-run 0.0.0.0:8443 <secret> --concurrency 4096
 ```
 
+### **Fix 4: MTG Secret Format Issue**
+The proxy was failing with "incorrect secret: incorrect first byte" because MTG v2 requires a specific secret format:
+```
+❌ Wrong: 546f0de42082e730d152eebeba5f8e9a (32 hex chars)
+✅ Correct: eef054bb2548ec430f2a667abc6277110474656c656772616d2e70756e6368737461727465722e636f6d
+```
+
+**MTG v2 Secret Format:**
+- Must start with `ee` for domain fronting (FakeTLS)
+- Format: `ee` + 16 random bytes (32 hex chars) + domain name in hex
+- Example breakdown:
+  - `ee` - Domain fronting prefix
+  - `f054bb2548ec430f2a667abc62771104` - 16 random bytes
+  - `74656c656772616d2e70756e6368737461727465722e636f6d` - "telegram.punchstarter.com" in hex
+
 **MTG v2 Changes:**
 - Uses `simple-run` subcommand instead of direct flags
 - `--bind` flag doesn't exist, address is positional argument
@@ -250,9 +265,10 @@ mtg simple-run 0.0.0.0:8443 546f0de42082e730d152eebeba5f8e9a \
 ✅ **Fixed**: URL format corrected for GitHub releases
 ✅ **Fixed**: Tar extraction path corrected for directory structure
 ✅ **Fixed**: MTG command format updated for v2.1.7 compatibility
+✅ **Fixed**: MTG secret format updated for v2 domain fronting
 ✅ **Enhanced**: Better error handling and verbose logging
 ✅ **Robust**: Multiple fallback strategies available
-✅ **Tested**: Version v2.1.7 with correct URL, extraction, and commands
+✅ **Tested**: Version v2.1.7 with correct URL, extraction, commands, and secrets
 ✅ **Reliable**: Should work on all Docker platforms including EasyPanel
 
 The build should now work reliably on EasyPanel and other Docker platforms!
