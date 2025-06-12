@@ -55,9 +55,12 @@ validate_env() {
 # Generate proxy links
 generate_links() {
     if [ -n "$SERVER_HOST" ]; then
-        PROXY_LINK="https://t.me/proxy?server=${SERVER_HOST}&port=${MTG_PORT}&secret=${MTG_SECRET}"
-        PROXY_LINK_TG="tg://proxy?server=${SERVER_HOST}&port=${MTG_PORT}&secret=${MTG_SECRET}"
-        
+        # Use external port from environment or default to internal port
+        EXTERNAL_PORT=${EXTERNAL_MTG_PORT:-$MTG_PORT}
+
+        PROXY_LINK="https://t.me/proxy?server=${SERVER_HOST}&port=${EXTERNAL_PORT}&secret=${MTG_SECRET}"
+        PROXY_LINK_TG="tg://proxy?server=${SERVER_HOST}&port=${EXTERNAL_PORT}&secret=${MTG_SECRET}"
+
         log_success "Proxy links:"
         echo "Web: $PROXY_LINK"
         echo "Telegram: $PROXY_LINK_TG"
@@ -65,54 +68,41 @@ generate_links() {
     fi
 }
 
-# Build mtg command
+# Build mtg command using simple-run mode
 build_command() {
-    MTG_CMD="mtg --bind ${MTG_BIND_IP}:${MTG_PORT} --secret $MTG_SECRET"
-    
-    # Add workers
-    MTG_CMD="$MTG_CMD --workers $MTG_WORKERS"
-    
+    # mtg v2 uses simple-run mode: mtg simple-run <bind-to> <secret> [flags]
+    MTG_CMD="mtg simple-run ${MTG_BIND_IP}:${MTG_PORT} $MTG_SECRET"
+
+    # Add concurrency (workers equivalent)
+    if [ -n "$MTG_WORKERS" ]; then
+        MTG_CMD="$MTG_CMD --concurrency $((MTG_WORKERS * 1024))"
+    fi
+
     # Add buffer size
-    MTG_CMD="$MTG_CMD --buffer-size $MTG_BUFFER_SIZE"
-    
+    if [ -n "$MTG_BUFFER_SIZE" ]; then
+        MTG_CMD="$MTG_CMD --tcp-buffer ${MTG_BUFFER_SIZE}B"
+    fi
+
     # Add timeout
-    MTG_CMD="$MTG_CMD --timeout ${MTG_TIMEOUT}s"
-    
-    # Security options
-    if [ "$MTG_SECURE_ONLY" = "true" ]; then
-        MTG_CMD="$MTG_CMD --secure-only"
+    if [ -n "$MTG_TIMEOUT" ]; then
+        MTG_CMD="$MTG_CMD --timeout ${MTG_TIMEOUT}s"
     fi
-    
-    if [ "$MTG_DISABLE_IPV6" = "true" ]; then
-        MTG_CMD="$MTG_CMD --disable-ipv6"
-    fi
-    
-    # TLS domain
-    if [ -n "$MTG_DOMAIN" ]; then
-        MTG_CMD="$MTG_CMD --domain $MTG_DOMAIN"
-    fi
-    
-    # Statistics
-    if [ "$MTG_STATS_ENABLED" = "true" ]; then
-        MTG_CMD="$MTG_CMD --stats ${MTG_STATS_IP}:${MTG_STATS_PORT}"
-    fi
-    
-    # Anti-replay
+
+    # Add anti-replay cache size
     if [ -n "$MTG_ANTI_REPLAY_MAX_SIZE" ]; then
-        MTG_CMD="$MTG_CMD --anti-replay-max-size $MTG_ANTI_REPLAY_MAX_SIZE"
+        MTG_CMD="$MTG_CMD --antireplay-cache-size ${MTG_ANTI_REPLAY_MAX_SIZE}KB"
     fi
-    
-    # Logging level
+
+    # Add domain fronting port (if domain is set)
+    if [ -n "$MTG_DOMAIN" ]; then
+        MTG_CMD="$MTG_CMD --domain-fronting-port 443"
+    fi
+
+    # Logging level (debug mode)
     case "$MTG_LOG_LEVEL" in
-        "debug") MTG_CMD="$MTG_CMD -vv" ;;
-        "info") MTG_CMD="$MTG_CMD -v" ;;
+        "debug") MTG_CMD="$MTG_CMD --debug" ;;
     esac
-    
-    # Upstream proxy
-    if [ -n "$MTG_UPSTREAM_PROXY" ]; then
-        MTG_CMD="$MTG_CMD --upstream-proxy $MTG_UPSTREAM_PROXY"
-    fi
-    
+
     echo "$MTG_CMD"
 }
 

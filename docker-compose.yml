@@ -11,6 +11,8 @@ services:
     environment:
       - MTG_SECRET=${MTG_SECRET}
       - MTG_PORT=8443
+      - EXTERNAL_MTG_PORT=${MTG_PORT:-8443}
+      - SERVER_HOST=${SERVER_HOST:-localhost}
       - MTG_BIND_IP=${MTG_BIND_IP:-0.0.0.0}
       - MTG_WORKERS=${MTG_WORKERS:-2}
       - MTG_BUFFER_SIZE=${MTG_BUFFER_SIZE:-16384}
@@ -24,11 +26,6 @@ services:
       - MTG_STATS_ENABLED=${MTG_STATS_ENABLED:-true}
       - MTG_LOG_LEVEL=${MTG_LOG_LEVEL:-info}
       - MTG_LOG_FORMAT=${MTG_LOG_FORMAT:-text}
-      - MTG_USER_AGENT=${MTG_USER_AGENT}
-      - MTG_MAX_CONNECTIONS_PER_IP=${MTG_MAX_CONNECTIONS_PER_IP:-0}
-      - MTG_RATE_LIMIT=${MTG_RATE_LIMIT:-0}
-      - MTG_TELEGRAM_DC=${MTG_TELEGRAM_DC}
-      - MTG_UPSTREAM_PROXY=${MTG_UPSTREAM_PROXY}
     volumes:
       - ./logs:/app/logs
       - ./config:/app/config
