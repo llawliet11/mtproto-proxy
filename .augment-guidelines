@@ -1,0 +1,237 @@
+# Augment AI Agent Guidelines for MTProto Proxy Project
+
+## Project Overview
+This is a production-ready MTProto proxy implementation for Telegram using the `mtg` Go-based proxy server. The project includes comprehensive setup automation, Docker support, monitoring tools, and security best practices.
+
+## Current State Assessment
+- ✅ **COMPLETE**: All core components implemented and tested
+- ✅ **READY**: Can be deployed immediately
+- ✅ **SECURE**: Follows security best practices
+- ✅ **DOCUMENTED**: Comprehensive documentation provided
+- ⚠️ **NOT RUNNING**: Proxy is configured but not started (intentional)
+
+## Key Project Information
+
+### Technology Stack
+- **Core**: mtg (Go-based MTProto proxy from 9seconds/mtg)
+- **Containerization**: Docker + Docker Compose
+- **Configuration**: Environment variables (.env)
+- **Automation**: Bash scripts + Makefile
+- **Security**: Hardened container + best practices
+
+### Critical Files & Their Purpose
+```
+.env                    # Active configuration with secure secret
+docker-compose.yml      # Production Docker setup
+Makefile               # Management commands (start, stop, monitor, etc.)
+setup.sh               # Interactive guided setup
+start.sh               # Proxy lifecycle management
+scripts/monitor.sh     # Real-time monitoring and statistics
+scripts/test-proxy.sh  # Comprehensive testing suite
+SECURITY.md            # Security best practices guide
+README.md              # Complete user documentation
+```
+
+### Current Configuration
+```
+Secret: 2e96222882f7c201b73dd8bd04262571 (secure, 32-char hex)
+Port: 8443 (main proxy)
+Stats Port: 3001 (monitoring)
+Server: localhost (change to actual domain/IP for production)
+Workers: 2 (optimal for most setups)
+Security: Enabled with best practices
+```
+
+## AI Agent Instructions
+
+### When User Asks About Status
+1. Run: `./scripts/test-proxy.sh` to check current state
+2. If proxy not running, explain it's configured but not started
+3. Offer to start it with: `make docker-up` or `make start`
+
+### When User Wants to Start Proxy
+1. **Recommended**: `make docker-up` (Docker deployment)
+2. **Alternative**: `make start` (manual deployment)
+3. After starting, run: `make status` to verify
+4. Show proxy links with: `make links`
+
+### When User Needs Configuration Changes
+1. Edit `.env` file directly
+2. Restart proxy: `make restart` or `make docker-down && make docker-up`
+3. Verify changes: `make status`
+
+### When User Reports Issues
+1. Check logs: `make logs` or `./scripts/monitor.sh logs`
+2. Run diagnostics: `./scripts/test-proxy.sh`
+3. Check system resources: `./scripts/monitor.sh resources`
+4. Refer to troubleshooting in `README.md` and `SECURITY.md`
+
+### When User Wants Monitoring
+1. Real-time monitoring: `make monitor`
+2. Statistics: `./scripts/monitor.sh stats`
+3. Health check: `make health`
+
+## Common User Scenarios
+
+### Scenario 1: "Start the proxy"
+```bash
+# Check if Docker is preferred
+make docker-up
+# Verify it's running
+make status
+# Show proxy links
+make links
+```
+
+### Scenario 2: "Change the port"
+```bash
+# Edit configuration
+nano .env  # Change MTG_PORT=8443 to desired port
+# Restart proxy
+make restart
+```
+
+### Scenario 3: "Is it working?"
+```bash
+# Run comprehensive tests
+./scripts/test-proxy.sh
+# Check real-time status
+make status
+```
+
+### Scenario 4: "How do I monitor it?"
+```bash
+# Start monitoring dashboard
+make monitor
+# Or check specific metrics
+./scripts/monitor.sh stats
+```
+
+### Scenario 5: "Security concerns"
+- Direct user to `SECURITY.md`
+- Verify current security settings in `.env`
+- Suggest running security checklist from `SECURITY.md`
+
+## Important Constraints & Guidelines
+
+### DO NOT
+- ❌ Modify the secret without user consent (it's already secure)
+- ❌ Change core Docker configuration without understanding implications
+- ❌ Start services without user permission
+- ❌ Expose sensitive information in logs or output
+- ❌ Make network changes without user awareness
+
+### ALWAYS
+- ✅ Test changes with `./scripts/test-proxy.sh`
+- ✅ Check status after making changes
+- ✅ Provide clear explanations of what commands do
+- ✅ Refer to existing documentation when appropriate
+- ✅ Prioritize security and best practices
+- ✅ Use the provided management commands (Makefile)
+
+### SECURITY PRIORITIES
+1. **Secret Management**: Current secret is secure, only change if requested
+2. **Port Security**: Default 8443 is recommended, validate any changes
+3. **Container Security**: Don't modify security settings without justification
+4. **Network Security**: Be cautious with firewall and network changes
+5. **Log Security**: Don't expose sensitive data in logs
+
+## Quick Diagnostic Commands
+
+### Health Check Sequence
+```bash
+# 1. Test configuration and setup
+./scripts/test-proxy.sh
+
+# 2. Check if proxy is running
+make status
+
+# 3. View recent logs if issues
+make logs
+
+# 4. Check system resources
+./scripts/monitor.sh resources
+```
+
+### Common Fixes
+```bash
+# Restart proxy
+make restart
+
+# Regenerate secret (if needed)
+./scripts/generate-secret.sh --update-env
+
+# Clean and restart
+make clean && make restart
+
+# Full Docker rebuild
+make docker-down && make docker-build && make docker-up
+```
+
+## User Communication Guidelines
+
+### When Explaining Status
+- Be clear about whether proxy is running or not
+- Explain what each test result means
+- Provide next steps based on current state
+
+### When Providing Instructions
+- Use the Makefile commands when possible (easier for user)
+- Explain what each command does
+- Provide alternatives (Docker vs manual)
+
+### When Troubleshooting
+- Start with simple diagnostics
+- Reference existing documentation
+- Provide step-by-step solutions
+- Explain the reasoning behind fixes
+
+## Integration Context
+
+### User Preferences (from memory)
+- Prefers following best practices
+- Values security and production-ready solutions
+- Appreciates comprehensive setup and documentation
+
+### Project Goals
+- Secure MTProto proxy for Telegram
+- Easy deployment and management
+- Production-ready with monitoring
+- Comprehensive documentation and automation
+
+### Success Criteria
+- Proxy runs reliably
+- Easy to manage and monitor
+- Secure configuration
+- Clear documentation for maintenance
+
+## Emergency Procedures
+
+### If Proxy Compromised
+1. Immediately stop: `make stop` or `make docker-down`
+2. Check logs: `make logs`
+3. Regenerate secret: `./scripts/generate-secret.sh --update-env`
+4. Review security: Reference `SECURITY.md`
+5. Restart with new configuration
+
+### If Configuration Corrupted
+1. Restore from backup: `cp .env.example .env`
+2. Regenerate secret: `./scripts/generate-secret.sh --update-env`
+3. Reconfigure as needed
+4. Test: `./scripts/test-proxy.sh`
+
+### If Docker Issues
+1. Stop containers: `make docker-down`
+2. Rebuild: `make docker-build`
+3. Restart: `make docker-up`
+4. Check logs: `make docker-logs`
+
+## Final Notes
+
+This project is COMPLETE and PRODUCTION-READY. The user can start using it immediately. Focus on helping them deploy, configure, and maintain it rather than building new features unless specifically requested.
+
+All necessary documentation exists in the project files. When in doubt, refer users to:
+- `README.md` for general usage
+- `SECURITY.md` for security concerns  
+- `CLAUDE.md` for technical details
+- `Makefile help` for available commands
