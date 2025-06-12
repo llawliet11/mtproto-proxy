@@ -17,10 +17,13 @@ RUN echo "Downloading mtg v${MTG_VERSION}..." \
        "https://github.com/9seconds/mtg/releases/download/v${MTG_VERSION}/mtg-${MTG_VERSION}-linux-amd64.tar.gz" \
     && echo "Download completed, extracting..." \
     && tar -xzf mtg.tar.gz \
+    && echo "Contents after extraction:" \
     && ls -la \
-    && mv mtg /usr/local/bin/mtg \
+    && echo "Contents of mtg directory:" \
+    && ls -la mtg-${MTG_VERSION}-linux-amd64/ \
+    && mv mtg-${MTG_VERSION}-linux-amd64/mtg /usr/local/bin/mtg \
     && chmod +x /usr/local/bin/mtg \
-    && rm mtg.tar.gz \
+    && rm -rf mtg.tar.gz mtg-${MTG_VERSION}-linux-amd64/ \
     && echo "Testing mtg binary..." \
     && mtg --version \
     && echo "mtg installation completed successfully"

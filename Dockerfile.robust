@@ -19,9 +19,9 @@ RUN echo "=== Attempting Strategy 1: Direct wget download ===" \
         "https://github.com/9seconds/mtg/releases/download/v${MTG_VERSION}/mtg-${MTG_VERSION}-linux-amd64.tar.gz" \
         && echo "Strategy 1: wget download successful" \
         && tar -xzf mtg.tar.gz \
-        && mv mtg /usr/local/bin/mtg \
+        && mv mtg-${MTG_VERSION}-linux-amd64/mtg /usr/local/bin/mtg \
         && chmod +x /usr/local/bin/mtg \
-        && rm mtg.tar.gz \
+        && rm -rf mtg.tar.gz mtg-${MTG_VERSION}-linux-amd64/ \
         && echo "Strategy 1: Installation completed") \
     || echo "Strategy 1: wget failed, trying Strategy 2..."
 
@@ -32,9 +32,9 @@ RUN if [ ! -f /usr/local/bin/mtg ]; then \
            "https://github.com/9seconds/mtg/releases/download/v${MTG_VERSION}/mtg-${MTG_VERSION}-linux-amd64.tar.gz" \
         && echo "Strategy 2: curl download successful" \
         && tar -xzf mtg.tar.gz \
-        && mv mtg /usr/local/bin/mtg \
+        && mv mtg-${MTG_VERSION}-linux-amd64/mtg /usr/local/bin/mtg \
         && chmod +x /usr/local/bin/mtg \
-        && rm mtg.tar.gz \
+        && rm -rf mtg.tar.gz mtg-${MTG_VERSION}-linux-amd64/ \
         && echo "Strategy 2: Installation completed"; \
     else \
         echo "Strategy 1 succeeded, skipping Strategy 2"; \
@@ -47,9 +47,9 @@ RUN if [ ! -f /usr/local/bin/mtg ]; then \
            "https://github.com/9seconds/mtg/releases/download/v2.1.6/mtg-2.1.6-linux-amd64.tar.gz" \
         && echo "Strategy 3: Previous version download successful" \
         && tar -xzf mtg.tar.gz \
-        && mv mtg /usr/local/bin/mtg \
+        && mv mtg-2.1.6-linux-amd64/mtg /usr/local/bin/mtg \
         && chmod +x /usr/local/bin/mtg \
-        && rm mtg.tar.gz \
+        && rm -rf mtg.tar.gz mtg-2.1.6-linux-amd64/ \
         && echo "Strategy 3: Installation completed with v2.1.6"; \
     else \
         echo "Previous strategy succeeded, skipping Strategy 3"; \
