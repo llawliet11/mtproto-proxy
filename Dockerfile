@@ -1,31 +1,30 @@
-# Multi-stage build for optimal image size
-FROM golang:1.21-alpine AS builder
-
-# Install build dependencies
-RUN apk add --no-cache git ca-certificates tzdata
-
-# Set working directory
-WORKDIR /build
-
-# Clone the mtg repository
-RUN git clone https://github.com/9seconds/mtg.git .
-
-# Build the application
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o mtg ./cmd/mtg
-
-# Final stage
+# Use Alpine Linux as base image
 FROM alpine:latest
 
-# Install runtime dependencies
-RUN apk --no-cache add ca-certificates curl tzdata && \
-    addgroup -g 1000 mtg && \
+# Install runtime dependencies and build tools
+RUN apk add --no-cache \
+    ca-certificates \
+    curl \
+    wget \
+    tzdata \
+    tar \
+    && update-ca-certificates
+
+# Download pre-built mtg binary from GitHub releases
+ARG MTG_VERSION=v2.1.7
+RUN wget -O mtg.tar.gz "https://github.com/9seconds/mtg/releases/download/${MTG_VERSION}/mtg-${MTG_VERSION}-linux-amd64.tar.gz" \
+    && tar -xzf mtg.tar.gz \
+    && mv mtg /usr/local/bin/mtg \
+    && chmod +x /usr/local/bin/mtg \
+    && rm mtg.tar.gz \
+    && mtg --version
+
+# Create non-root user for security
+RUN addgroup -g 1000 mtg && \
     adduser -D -s /bin/sh -u 1000 -G mtg mtg
 
 # Set working directory
 WORKDIR /app
-
-# Copy binary from builder stage
-COPY --from=builder /build/mtg /usr/local/bin/mtg
 
 # Create necessary directories
 RUN mkdir -p /app/logs /app/config && \
