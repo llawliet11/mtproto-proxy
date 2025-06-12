@@ -85,6 +85,7 @@ generate_links() {
 # Build mtg command using simple-run mode
 build_command() {
     # mtg v2 uses simple-run mode: mtg simple-run <bind-to> <secret> [flags]
+    # Use internal container port (MTG_PORT), not external port
     MTG_CMD="mtg simple-run ${MTG_BIND_IP}:${MTG_PORT} $MTG_SECRET"
 
     # Add concurrency (workers equivalent)
