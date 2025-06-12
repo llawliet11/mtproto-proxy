@@ -154,35 +154,47 @@ docker build --build-arg MTG_VERSION=v2.1.7 -t mtproto-proxy .
 - **Architecture**: linux-amd64
 - **Release Date**: August 9, 2022
 
-## Latest Fix (URL Format Issue)
+## Latest Fixes
 
-### **The URL Bug**
+### **Fix 1: URL Format Issue**
 The download was failing with 404 because the URL format was incorrect:
 ```
 ❌ Wrong: mtg-v2.1.7-linux-amd64.tar.gz
 ✅ Correct: mtg-2.1.7-linux-amd64.tar.gz
 ```
 
-### **Fixed URL Format**
-```dockerfile
-# Fixed version variable and URL
-ARG MTG_VERSION=2.1.7  # No 'v' prefix in variable
-RUN wget -O mtg.tar.gz \
-    "https://github.com/9seconds/mtg/releases/download/v${MTG_VERSION}/mtg-${MTG_VERSION}-linux-amd64.tar.gz"
+### **Fix 2: Tar Extraction Path Issue**
+The binary extraction was failing because the tar file contains a directory:
+```
+❌ Wrong: mv mtg /usr/local/bin/mtg
+✅ Correct: mv mtg-2.1.7-linux-amd64/mtg /usr/local/bin/mtg
 ```
 
-### **Enhanced Error Handling**
-Added better logging and error handling:
+**Tar file structure:**
+```
+mtg-2.1.7-linux-amd64/
+├── LICENSE
+├── README.md
+├── SECURITY.md
+└── mtg              # ← The binary is here
+```
+
+### **Fixed URL Format and Extraction**
 ```dockerfile
+# Fixed version variable, URL, and extraction path
+ARG MTG_VERSION=2.1.7  # No 'v' prefix in variable
 RUN echo "Downloading mtg v${MTG_VERSION}..." \
     && wget --timeout=30 --tries=3 -O mtg.tar.gz \
        "https://github.com/9seconds/mtg/releases/download/v${MTG_VERSION}/mtg-${MTG_VERSION}-linux-amd64.tar.gz" \
     && echo "Download completed, extracting..." \
     && tar -xzf mtg.tar.gz \
+    && echo "Contents after extraction:" \
     && ls -la \
-    && mv mtg /usr/local/bin/mtg \
+    && echo "Contents of mtg directory:" \
+    && ls -la mtg-${MTG_VERSION}-linux-amd64/ \
+    && mv mtg-${MTG_VERSION}-linux-amd64/mtg /usr/local/bin/mtg \
     && chmod +x /usr/local/bin/mtg \
-    && rm mtg.tar.gz \
+    && rm -rf mtg.tar.gz mtg-${MTG_VERSION}-linux-amd64/ \
     && echo "Testing mtg binary..." \
     && mtg --version \
     && echo "mtg installation completed successfully"
@@ -192,7 +204,8 @@ RUN echo "Downloading mtg v${MTG_VERSION}..." \
 
 ### **1. Dockerfile** (Main - Fixed)
 - ✅ Uses correct URL format
-- ✅ Enhanced error handling
+- ✅ Correct tar extraction path
+- ✅ Enhanced error handling and logging
 - ✅ Pre-built binaries v2.1.7
 - ✅ Fast and reliable
 
@@ -210,9 +223,10 @@ RUN echo "Downloading mtg v${MTG_VERSION}..." \
 ## Summary
 
 ✅ **Fixed**: URL format corrected for GitHub releases
-✅ **Enhanced**: Better error handling and logging
+✅ **Fixed**: Tar extraction path corrected for directory structure
+✅ **Enhanced**: Better error handling and verbose logging
 ✅ **Robust**: Multiple fallback strategies available
-✅ **Tested**: Version v2.1.7 with correct URL format
+✅ **Tested**: Version v2.1.7 with correct URL and extraction
 ✅ **Reliable**: Should work on all Docker platforms including EasyPanel
 
 The build should now work reliably on EasyPanel and other Docker platforms!
