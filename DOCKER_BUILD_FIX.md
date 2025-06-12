@@ -220,13 +220,39 @@ RUN echo "Downloading mtg v${MTG_VERSION}..." \
 - ✅ Updated to v2.1.7
 - ✅ More control over build process
 
+### **Fix 3: MTG Command Format Issue**
+The proxy was failing to start because mtg v2.1.7 uses a different command format:
+```
+❌ Wrong: mtg --bind 0.0.0.0:8443 --secret <secret> --workers 4
+✅ Correct: mtg simple-run 0.0.0.0:8443 <secret> --concurrency 4096
+```
+
+**MTG v2 Changes:**
+- Uses `simple-run` subcommand instead of direct flags
+- `--bind` flag doesn't exist, address is positional argument
+- `--workers` replaced with `--concurrency` (value * 1024)
+- `--stats` flag removed (statistics built-in)
+- Many flags simplified or removed
+
+**Fixed Command Structure:**
+```dockerfile
+# New mtg v2.1.7 command format
+mtg simple-run 0.0.0.0:8443 546f0de42082e730d152eebeba5f8e9a \
+    --concurrency 4096 \
+    --tcp-buffer 32768B \
+    --timeout 15s \
+    --antireplay-cache-size 256KB \
+    --domain-fronting-port 443
+```
+
 ## Summary
 
 ✅ **Fixed**: URL format corrected for GitHub releases
 ✅ **Fixed**: Tar extraction path corrected for directory structure
+✅ **Fixed**: MTG command format updated for v2.1.7 compatibility
 ✅ **Enhanced**: Better error handling and verbose logging
 ✅ **Robust**: Multiple fallback strategies available
-✅ **Tested**: Version v2.1.7 with correct URL and extraction
+✅ **Tested**: Version v2.1.7 with correct URL, extraction, and commands
 ✅ **Reliable**: Should work on all Docker platforms including EasyPanel
 
 The build should now work reliably on EasyPanel and other Docker platforms!
