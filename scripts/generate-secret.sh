@@ -17,17 +17,26 @@ log_success() {
     echo -e "${GREEN}[SUCCESS]${NC} $1"
 }
 
-# Generate secret
+# Generate MTG v2 compatible secret with domain fronting
 generate_secret() {
+    local domain=${1:-"google.com"}
+
+    echo "Generating MTG secret for domain: $domain" >&2
+
+    # Generate 16 random bytes
     if command -v openssl &> /dev/null; then
-        SECRET=$(openssl rand -hex 16)
-    elif command -v xxd &> /dev/null; then
-        SECRET=$(head -c 16 /dev/urandom | xxd -p)
+        RANDOM_BYTES=$(openssl rand 16 | xxd -p -c 16)
     else
         # Fallback method
-        SECRET=$(head /dev/urandom | tr -dc a-f0-9 | head -c 32)
+        RANDOM_BYTES=$(head -c 16 /dev/urandom | xxd -p -c 16)
     fi
-    
+
+    # Convert domain to hex
+    DOMAIN_HEX=$(echo -n "$domain" | xxd -p -c 256)
+
+    # MTG secret format for domain fronting: ee + 16 random bytes + domain in hex
+    SECRET="ee${RANDOM_BYTES}${DOMAIN_HEX}"
+
     echo "$SECRET"
 }
 
@@ -55,23 +64,28 @@ update_env() {
 
 # Main function
 main() {
-    log_info "Generating new MTProto proxy secret..."
-    
-    SECRET=$(generate_secret)
-    
-    if [[ ${#SECRET} -ne 32 ]]; then
-        echo "Error: Generated secret is not 32 characters long"
+    local domain=${2:-"google.com"}
+
+    log_info "Generating new MTProto proxy secret for domain: $domain"
+
+    SECRET=$(generate_secret "$domain")
+
+    # MTG v2 secrets are longer (ee + 32 hex chars + domain hex)
+    if [[ ! $SECRET == ee* ]]; then
+        echo "Error: Generated secret doesn't start with 'ee'"
         exit 1
     fi
-    
+
     log_success "Generated secret: $SECRET"
-    
+    log_info "Domain: $domain"
+    log_info "Secret length: ${#SECRET} characters"
+
     if [[ "$1" == "--update-env" ]]; then
         update_env "$SECRET"
     else
         echo ""
         echo "To update your .env file, run:"
-        echo "$0 --update-env"
+        echo "$0 --update-env $domain"
         echo ""
         echo "Or manually update MTG_SECRET in your .env file:"
         echo "MTG_SECRET=$SECRET"
