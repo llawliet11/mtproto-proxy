@@ -28,8 +28,10 @@ setup.sh               # Interactive guided setup
 start.sh               # Proxy lifecycle management
 scripts/monitor.sh     # Real-time monitoring and statistics
 scripts/test-proxy.sh  # Comprehensive testing suite
-SECURITY.md            # Security best practices guide
+docs/SECURITY.md       # Security best practices guide
+docs/SENSITIVE_FILES.md # Sensitive files management guide
 README.md              # Complete user documentation
+CLAUDE.md              # AI agent continuation guide
 ```
 
 ### Current Configuration
@@ -64,7 +66,7 @@ Security: Enabled with best practices
 1. Check logs: `make logs` or `./scripts/monitor.sh logs`
 2. Run diagnostics: `./scripts/test-proxy.sh`
 3. Check system resources: `./scripts/monitor.sh resources`
-4. Refer to troubleshooting in `README.md` and `SECURITY.md`
+4. Refer to troubleshooting in `README.md` and `docs/SECURITY.md`
 
 ### When User Wants Monitoring
 1. Real-time monitoring: `make monitor`
@@ -108,9 +110,9 @@ make monitor
 ```
 
 ### Scenario 5: "Security concerns"
-- Direct user to `SECURITY.md`
+- Direct user to `docs/SECURITY.md`
 - Verify current security settings in `.env`
-- Suggest running security checklist from `SECURITY.md`
+- Suggest running security checklist from `docs/SECURITY.md`
 
 ## Important Constraints & Guidelines
 

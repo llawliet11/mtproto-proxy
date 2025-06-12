@@ -1,5 +1,16 @@
 # MTProto Proxy Project - AI Agent Continuation Guide
 
+## Claude Code Imports
+This file imports additional documentation for comprehensive context:
+
+- Project overview and setup: @README.md
+- Security guidelines and best practices: @docs/SECURITY.md
+- Sensitive files management: @docs/SENSITIVE_FILES.md
+- Project architecture and summary: @docs/PROJECT_SUMMARY.md
+- Docker build troubleshooting: @docs/DOCKER_BUILD_FIX.md
+- Docker ports configuration: @docs/DOCKER_PORTS_EXPLAINED.md
+- AI agent operational guidelines: @.augment-guidelines
+
 ## Project Context & History
 
 This is a complete MTProto proxy implementation for Telegram, built from scratch based on research of current best practices in 2024. The project was created to provide a secure, production-ready proxy server using the `mtg` (Go-based) implementation.
@@ -53,8 +64,11 @@ User requested: "Research the internet, and build project for creating MTPROTO p
 - `scripts/test-proxy.sh` - Comprehensive testing suite
 
 #### Documentation
-- `SECURITY.md` - Complete security guide
-- `PROJECT_SUMMARY.md` - Detailed project overview
+- `docs/SECURITY.md` - Complete security guide
+- `docs/SENSITIVE_FILES.md` - Sensitive files management
+- `docs/PROJECT_SUMMARY.md` - Detailed project overview
+- `docs/DOCKER_BUILD_FIX.md` - Docker build troubleshooting
+- `docs/DOCKER_PORTS_EXPLAINED.md` - Docker ports configuration
 - `CLAUDE.md` - This continuation guide
 - `.augment-guidelines` - AI agent guidelines
 
@@ -98,12 +112,16 @@ mtproto-proxy/
 │   ├── scripts/generate-secret.sh # Secure secret generation
 │   ├── scripts/monitor.sh       # Real-time monitoring
 │   └── scripts/test-proxy.sh    # Testing suite
-└── Documentation
-    ├── README.md             # User documentation
-    ├── SECURITY.md          # Security best practices
-    ├── PROJECT_SUMMARY.md   # Project overview
-    ├── CLAUDE.md           # This file
-    └── .augment-guidelines  # AI agent guidelines
+├── Documentation
+│   ├── README.md             # User documentation (root level)
+│   ├── CLAUDE.md            # This file (root level)
+│   ├── .augment-guidelines  # AI agent guidelines (root level)
+│   └── docs/                # Documentation folder
+│       ├── SECURITY.md          # Security best practices
+│       ├── SENSITIVE_FILES.md   # Sensitive files management
+│       ├── PROJECT_SUMMARY.md   # Project overview
+│       ├── DOCKER_BUILD_FIX.md  # Docker build troubleshooting
+│       └── DOCKER_PORTS_EXPLAINED.md # Docker ports configuration
 ```
 
 ## Key Technical Details
@@ -336,5 +354,7 @@ make stop  # or make docker-down
 - **Management**: `Makefile`
 - **Testing**: `scripts/test-proxy.sh`
 - **Monitoring**: `scripts/monitor.sh`
-- **Security guide**: `SECURITY.md`
+- **Security guide**: `docs/SECURITY.md`
+- **Sensitive files guide**: `docs/SENSITIVE_FILES.md`
 - **User docs**: `README.md`
+- **AI guidelines**: `.augment-guidelines`
