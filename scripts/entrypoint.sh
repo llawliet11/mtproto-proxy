@@ -4,7 +4,7 @@
 
 set -e
 
-# Default values
+# Default values (container uses standard ports internally)
 MTG_PORT=${MTG_PORT:-8443}
 MTG_BIND_IP=${MTG_BIND_IP:-0.0.0.0}
 MTG_WORKERS=${MTG_WORKERS:-2}

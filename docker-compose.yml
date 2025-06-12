@@ -6,11 +6,11 @@ services:
     container_name: ${CONTAINER_NAME:-mtproto-proxy}
     restart: ${RESTART_POLICY:-unless-stopped}
     ports:
-      - "${MTG_PORT:-8443}:${MTG_PORT:-8443}"
-      - "${MTG_STATS_PORT:-3001}:${MTG_STATS_PORT:-3001}"
+      - "${MTG_PORT:-8443}:8443"
+      - "${MTG_STATS_PORT:-3001}:3001"
     environment:
       - MTG_SECRET=${MTG_SECRET}
-      - MTG_PORT=${MTG_PORT:-8443}
+      - MTG_PORT=8443
       - MTG_BIND_IP=${MTG_BIND_IP:-0.0.0.0}
       - MTG_WORKERS=${MTG_WORKERS:-2}
       - MTG_BUFFER_SIZE=${MTG_BUFFER_SIZE:-16384}
@@ -20,7 +20,7 @@ services:
       - MTG_ANTI_REPLAY_MAX_SIZE=${MTG_ANTI_REPLAY_MAX_SIZE:-128}
       - MTG_DOMAIN=${MTG_DOMAIN}
       - MTG_STATS_IP=${MTG_STATS_IP:-127.0.0.1}
-      - MTG_STATS_PORT=${MTG_STATS_PORT:-3001}
+      - MTG_STATS_PORT=3001
       - MTG_STATS_ENABLED=${MTG_STATS_ENABLED:-true}
       - MTG_LOG_LEVEL=${MTG_LOG_LEVEL:-info}
       - MTG_LOG_FORMAT=${MTG_LOG_FORMAT:-text}
@@ -35,7 +35,7 @@ services:
     networks:
       - mtproto-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:${MTG_STATS_PORT:-3001}/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
       interval: 30s
       timeout: 10s
       retries: 3
