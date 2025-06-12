@@ -1,0 +1,11 @@
+MTProto Proxy Test Report
+Generated: Thu Jun 12 22:43:02 +07 2025
+
+Configuration:
+- Secret: 2e962228...
+- Port: 8443
+- Server: localhost
+- Workers: 2
+- Stats Enabled: true
+
+Test Results:

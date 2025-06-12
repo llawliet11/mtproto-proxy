@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  mtproto-proxy:
+    build: .
+    container_name: ${CONTAINER_NAME:-mtproto-proxy}
+    restart: ${RESTART_POLICY:-unless-stopped}
+    ports:
+      - "${MTG_PORT:-8443}:${MTG_PORT:-8443}"
+      - "${MTG_STATS_PORT:-3001}:${MTG_STATS_PORT:-3001}"
+    environment:
+      - MTG_SECRET=${MTG_SECRET}
+      - MTG_PORT=${MTG_PORT:-8443}
+      - MTG_BIND_IP=${MTG_BIND_IP:-0.0.0.0}
+      - MTG_WORKERS=${MTG_WORKERS:-2}
+      - MTG_BUFFER_SIZE=${MTG_BUFFER_SIZE:-16384}
+      - MTG_TIMEOUT=${MTG_TIMEOUT:-10}
+      - MTG_SECURE_ONLY=${MTG_SECURE_ONLY:-true}
+      - MTG_DISABLE_IPV6=${MTG_DISABLE_IPV6:-false}
+      - MTG_ANTI_REPLAY_MAX_SIZE=${MTG_ANTI_REPLAY_MAX_SIZE:-128}
+      - MTG_DOMAIN=${MTG_DOMAIN}
+      - MTG_STATS_IP=${MTG_STATS_IP:-127.0.0.1}
+      - MTG_STATS_PORT=${MTG_STATS_PORT:-3001}
+      - MTG_STATS_ENABLED=${MTG_STATS_ENABLED:-true}
+      - MTG_LOG_LEVEL=${MTG_LOG_LEVEL:-info}
+      - MTG_LOG_FORMAT=${MTG_LOG_FORMAT:-text}
+      - MTG_USER_AGENT=${MTG_USER_AGENT}
+      - MTG_MAX_CONNECTIONS_PER_IP=${MTG_MAX_CONNECTIONS_PER_IP:-0}
+      - MTG_RATE_LIMIT=${MTG_RATE_LIMIT:-0}
+      - MTG_TELEGRAM_DC=${MTG_TELEGRAM_DC}
+      - MTG_UPSTREAM_PROXY=${MTG_UPSTREAM_PROXY}
+    volumes:
+      - ./logs:/app/logs
+      - ./config:/app/config
+    networks:
+      - mtproto-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${MTG_STATS_PORT:-3001}/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    security_opt:
+      - no-new-privileges:true
+    read_only: false
+    tmpfs:
+      - /tmp:noexec,nosuid,size=100m
+
+networks:
+  mtproto-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  logs:
+    driver: local
+  config:
+    driver: local
