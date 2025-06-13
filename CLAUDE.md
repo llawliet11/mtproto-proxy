@@ -347,12 +347,8 @@ make stop  # or make docker-down
 ```
 
 ### File Locations for Quick Access
-- **Main config**: `.env`
-- **Docker setup**: `docker-compose.yml`
-- **Management**: `Makefile`
-- **Testing**: `scripts/test-proxy.sh`
-- **Monitoring**: `scripts/monitor.sh`
-- **Security guide**: `docs/SECURITY.md`
-- **Sensitive files guide**: `docs/SENSITIVE_FILES.md`
-- **User docs**: `README.md`
-- **AI guidelines**: `.augment-guidelines`
+For main configuration settings, check @.env file. Docker deployment configuration is in @docker-compose.yml and management commands are available in @Makefile.
+
+Testing can be performed using @scripts/test-proxy.sh and monitoring with @scripts/monitor.sh.
+
+For comprehensive documentation, refer to @README.md for user docs, @docs/SECURITY.md for security guide, @docs/SENSITIVE_FILES.md for sensitive files guide, and @.augment-guidelines for AI guidelines.
