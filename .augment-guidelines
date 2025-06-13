@@ -66,7 +66,7 @@ Security: Enabled with best practices
 1. Check logs: `make logs` or `./scripts/monitor.sh logs`
 2. Run diagnostics: `./scripts/test-proxy.sh`
 3. Check system resources: `./scripts/monitor.sh resources`
-4. Refer to troubleshooting in `README.md` and `docs/SECURITY.md`
+4. Refer to troubleshooting in `README.md`, `docs/SECURITY.md`, and `docs/PROJECT_SUMMARY.md`
 
 ### When User Wants Monitoring
 1. Real-time monitoring: `make monitor`
@@ -113,6 +113,7 @@ make monitor
 - Direct user to `docs/SECURITY.md`
 - Verify current security settings in `.env`
 - Suggest running security checklist from `docs/SECURITY.md`
+- Reference `docs/SENSITIVE_FILES.md` for sensitive files management
 
 ## Important Constraints & Guidelines
 
@@ -213,7 +214,7 @@ make docker-down && make docker-build && make docker-up
 1. Immediately stop: `make stop` or `make docker-down`
 2. Check logs: `make logs`
 3. Regenerate secret: `./scripts/generate-secret.sh --update-env`
-4. Review security: Reference `SECURITY.md`
+4. Review security: Reference `docs/SECURITY.md`
 5. Restart with new configuration
 
 ### If Configuration Corrupted
@@ -234,6 +235,10 @@ This project is COMPLETE and PRODUCTION-READY. The user can start using it immed
 
 All necessary documentation exists in the project files. When in doubt, refer users to:
 - `README.md` for general usage
-- `SECURITY.md` for security concerns  
-- `CLAUDE.md` for technical details
+- `docs/SECURITY.md` for security concerns
+- `docs/SENSITIVE_FILES.md` for sensitive files management
+- `docs/PROJECT_SUMMARY.md` for project architecture overview
+- `docs/DOCKER_BUILD_FIX.md` for Docker build troubleshooting
+- `docs/DOCKER_PORTS_EXPLAINED.md` for Docker ports configuration
+- `CLAUDE.md` for technical details and AI agent continuation
 - `Makefile help` for available commands

@@ -3,13 +3,15 @@
 ## Claude Code Imports
 This file imports additional documentation for comprehensive context:
 
-- Project overview and setup: @README.md
-- Security guidelines and best practices: @docs/SECURITY.md
-- Sensitive files management: @docs/SENSITIVE_FILES.md
-- Project architecture and summary: @docs/PROJECT_SUMMARY.md
-- Docker build troubleshooting: @docs/DOCKER_BUILD_FIX.md
-- Docker ports configuration: @docs/DOCKER_PORTS_EXPLAINED.md
-- AI agent operational guidelines: @.augment-guidelines
+@README.md
+@docs/SECURITY.md
+@docs/SENSITIVE_FILES.md
+@docs/PROJECT_SUMMARY.md
+@docs/DOCKER_BUILD_FIX.md
+@docs/DOCKER_PORTS_EXPLAINED.md
+@.augment-guidelines
+
+The imports above use Claude Code's file import syntax to automatically load these files into Claude's memory when working with this project.
 
 ## Project Context & History
 
